@@ -2,6 +2,8 @@ import socket
 import sys, select
 from threading import Thread
 import time
+import json
+import os
 
 # first check for config.json
 config_file_check = os.path.isfile('config.json')

@@ -3,7 +3,8 @@ from threading import Thread
 import os
 import json
 
-# first check for config.json
+
+# <editor-fold desc="First check for config.json">
 config_file_check = os.path.isfile('config.json')
 if config_file_check is True:
     config = json.load(open('config.json', 'r'))
@@ -16,9 +17,31 @@ elif config_file_check is False:
     with open('config.json', 'w') as file:
         json.dump(config, file)
         file.close()
-os.system('clear')
+if os.path.isfile('client.py') is False:
+    client_file = open('client_template.py', 'r').readlines()
+    client_file[7] = client_file[7].format(config['serverIp'])
+    client_file[8] = client_file[8].format(config['serverPort'])
+    with open('client.py', 'w') as file:
+        for x in client_file:
+            file.write(x)
+        file.close()
+elif os.path.isfile('client.py') is True:
+    client_file = open('client.py', 'r').readlines()
+    client_file_ip = (client_file[7].split('='))[1]
+    client_file_port = (client_file[8].split('='))[1]
+    if client_file_ip != config['serverIp'] and client_file_port != config['serverPort']:
+        client_file[7] = 'ip_server = {}'.format(config['serverIp'])
+        client_file[8] = 'port_server = {}'.format(config['serverPort'])
+    with open('client.py', 'w') as file:
+        for x in client_file:
+            file.write(x)
+        file.close()
 
-# variables
+os.system('clear')
+# </editor-fold>
+
+
+# <editor-fold desc="Variables">
 running = True
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, True)
@@ -26,6 +49,7 @@ sock.bind((config['serverIp'], config['serverPort']))
 admin_ip = ''
 admin_password = config['adminPasswd']
 bots = []
+# </editor-fold>
 
 
 def listen(conn, ip):
